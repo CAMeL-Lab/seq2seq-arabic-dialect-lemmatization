@@ -153,3 +153,24 @@ def evaluate_disambiguation_with_sentences(
     df.loc[mask, 's2s_predicted_lemma'] = df.loc[mask, 'word']
     
     return df
+
+def get_context_window(df, sentence_index, word_index, window_size=2):
+    # Get words and their indices for the sentence
+    sentence_data = df[df['sentence_index'] == sentence_index][['word', 'word_index']].sort_values(by='word_index')
+    words = sentence_data['word'].astype(str).tolist()
+    indices = sentence_data['word_index'].tolist()
+    # oracle_pos_tags = sentence_data['pos_tag_encoded'].tolist()
+    
+    # Find the position of the target word
+    target_pos = indices.index(word_index)
+    
+    # Define context window
+    start_idx = max(0, target_pos - window_size)
+    end_idx = min(len(words), target_pos + window_size + 1)
+    context_words = words[start_idx:end_idx]
+    
+    # Mark the target word with <target> tags
+    target_word_idx = target_pos - start_idx
+    context_words[target_word_idx] = f"<target>{context_words[target_word_idx]}<target>"
+    
+    return f"lemmatize: {' '.join(context_words)}"
