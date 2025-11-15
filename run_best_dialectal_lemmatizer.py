@@ -1,15 +1,16 @@
 # main.py
 import argparse
-from utils_script import (
+from utils import (
     load_disambiguators,
     remove_sukun_and_tatweel,
     evaluate_disambiguation_with_sentences,
+    get_context_window
 )
 
-from s2s_prediction import S2S_pred
+from lemma_seq2seq_inference import S2S_pred
 import pandas as pd
 import os
-
+from tqdm import tqdm
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Run Arabic disambiguation pipeline")
@@ -19,12 +20,6 @@ def parse_args():
 
     parser.add_argument("--data_path", type=str, required=True,
                         help="Path to the input dev CSV")
-
-    parser.add_argument("--model", type=str, required=True,
-                        help="Path to the S2S model folder")
-
-    parser.add_argument("--granularity", type=str, default="lex",
-                        help="Granularity (lex, pos, stemgloss)")
 
     parser.add_argument("--output", type=str, default="egy_predictions.csv",
                         help="Output CSV file")
@@ -42,10 +37,18 @@ def main():
     test_df = pd.read_csv(args.data_path)
 
     # 3) S2S prediction
-    models_list = [args.model]
     dev_name = os.path.basename(args.data_path).replace(".csv", "")
 
-    s2s_dir = S2S_pred(models_list, args.data_path, dev_name)
+    # Sort test_df by sentence_index and word_index
+    S2S_test_df = test_df.sort_values(by=["sentence_index", "word_index"])
+
+    tqdm.pandas(desc="Generating valid context")
+    S2S_test_df['input_text'] = S2S_test_df.progress_apply(
+        lambda row: get_context_window(S2S_test_df, row['sentence_index'], row['word_index']), axis=1
+    )
+
+    s2s_dialect = args.dialect
+    s2s_dir = S2S_pred(s2s_dialect, S2S_test_df, dev_name)
     s2s_df = pd.read_csv(s2s_dir)
 
     # 4) Attach predictions
@@ -56,7 +59,7 @@ def main():
     result_df = evaluate_disambiguation_with_sentences(test_df, disambig_models)
 
     # 6) Save output
-    result_df[["s2s_predicted_lemma"]].to_csv(args.output, index=False)
+    result_df[["sentence_index","word_index","word","s2s_predicted_lemma"]].to_csv(args.output, index=False)
     print(f"Saved predictions to {args.output}")
 
 
