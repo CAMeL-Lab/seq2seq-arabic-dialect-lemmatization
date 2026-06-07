@@ -25,10 +25,10 @@ git clone https://github.com/CAMeL-Lab/seq2seq-arabic-dialect-lemmatization.git
 cd seq2seq-arabic-dialect-lemmatization
 
 # 1. Create a new conda environment
-conda create -n dialectal_lemma_env python=3.12.7
+conda create -n dialectal_lemma_env_again python=3.12.7
 
 # 2. Activate the environment
-conda activate dialectal_lemma_env
+conda activate dialectal_lemma_env_again
 
 # 3. Install Python dependencies
 pip install -r requirements.txt

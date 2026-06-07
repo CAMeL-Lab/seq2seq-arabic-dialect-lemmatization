@@ -5,7 +5,7 @@ import pandas as pd
 
 def load_disambiguators(dialect, back_off='NOAN_PROP'):
     if dialect == 'egy':
-        egy_db = MorphologyDB('morphological DBs/calima-egy-c044_0.1.1.utf8.db')
+        egy_db = MorphologyDB('data and morph DB/Egy morph db/calima-egy-c044_0.1.1.utf8.db')
         egy_calima_analyzer = Analyzer(egy_db, back_off)
 
         egy_bert = BERTUnfactoredDisambiguator.pretrained(
@@ -15,7 +15,7 @@ def load_disambiguators(dialect, back_off='NOAN_PROP'):
         disambig_list = [egy_bert]
 
     elif dialect == 'glf':
-        egy_db = MorphologyDB('morphological DBs/calima-egy-c044_0.1.1.utf8.db')
+        egy_db = MorphologyDB('data and morph DB/Egy morph db/calima-egy-c044_0.1.1.utf8.db')
         egy_calima_analyzer = Analyzer(egy_db, back_off)
 
         egy_bert = BERTUnfactoredDisambiguator.pretrained(
@@ -36,7 +36,7 @@ def load_disambiguators(dialect, back_off='NOAN_PROP'):
         disambig_list = [glf_bert, egy_bert, lev_bert]
 
     elif dialect == 'lev':
-        egy_db = MorphologyDB('morphological DBs/calima-egy-c044_0.1.1.utf8.db')
+        egy_db = MorphologyDB('data and morph DB/Egy morph db/calima-egy-c044_0.1.1.utf8.db')
         egy_calima_analyzer = Analyzer(egy_db, back_off)
 
         egy_bert = BERTUnfactoredDisambiguator.pretrained(
